@@ -25,7 +25,7 @@ int dollar[N_MAX_USER];                  //dollars that each player has
 int n_user;                           //number of users
 
 
-								 //play yard information
+                             //play yard information
 int cardhold[N_MAX_USER + 1][N_MAX_CARDHOLD];   //cards that currently the players hold
 int cardSum[N_MAX_USER];               //sum of the cards
 int bet[N_MAX_USER];                  //current betting 
@@ -53,7 +53,21 @@ void printCard(int cardnum) {
 
 //mix the card sets and put in the array
 int mixCardTray(void) {
+   int nTmp;
+   int card[N_CARD] = { 0 }; // 52까지 setting
+   for (int i = 0; i < N_CARD; i++) {
+      card[i] = i;
+   }
+   for (int i = N_CARD - 1; i >= 0; i--) {
 
+      int n = rand() % N_CARD;
+      nTmp = card[i];
+      card[i] = card[n];
+      card[n] = nTmp;
+
+   }
+
+   
 }
 
 //get one card from the tray
@@ -79,12 +93,13 @@ int configUser(void) {
 //betting
 int betDollar(void) {
    int total_D = 50;
-   int bet_D = 0;
+   
    printf("------- BETTING STEP -------\n");
-   printf("   -> your betting (total: $%d) : ", bet_D);
-   scanf("%d", &bet_D);
-   for (int i = 0; i < n_user; i++) {
-      printf("   -> player%d bets $%d (out of $50)", i, rand() % N_MAX_BET + 1);
+   printf("   -> your betting (total: $%d) : ", dollar[0]); // 0번째가 you
+   scanf("%d", &bet[0]);
+   for (int i = 1; i < n_user; i++) {
+      bet[i] = rand() % N_MAX_BET;
+      printf("   -> player%d bets $%d (out of $%d)", i, bet[i], dollar[i]);
    }
    printf("----------------------------");
 
@@ -213,6 +228,10 @@ int main(int argc, char *argv[]) {
       
       printRound();
 
+      for (int i = 0; i < n_user; i++) {
+         dollar[i] = 50; // 각 user dollar 초기화
+      }
+
       betDollar(); //
       offerCards(); //1. give cards to all the players
 
@@ -223,7 +242,7 @@ int main(int argc, char *argv[]) {
       for (int i = 0; i < n_user; i++) //each player
       {
          //나, p1, p2 ... 순서로 진행
-         printf("... turn! -------------");
+         printf("my turn! -------------");
          while (!calcStepResult() || !getAction()) //do until the player dies or player says stop
          {
             //print current card status printUserCardStatus();
